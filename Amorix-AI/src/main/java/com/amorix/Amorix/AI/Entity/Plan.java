@@ -11,7 +11,7 @@ import java.math.BigInteger;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Plan {
-    BigInteger id;
+    Long id;
     String name;
     String stripePriceId;
     int maxProjects;

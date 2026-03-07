@@ -12,7 +12,7 @@ import java.time.Instant;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatMessage {
-    Integer id;
+    Long id;
     BigInteger userId;
     BigInteger projectId;
     String role;
