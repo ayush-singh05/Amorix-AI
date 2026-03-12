@@ -12,7 +12,7 @@ import java.time.Instant;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Subscription {
-    BigInteger id;
+    Long id;
     BigInteger userId;
     BigInteger planId;
     String stripeSubscriptionId;

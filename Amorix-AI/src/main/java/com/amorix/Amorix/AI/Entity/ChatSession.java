@@ -12,7 +12,7 @@ import java.time.Instant;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChatSession {
-    BigInteger projectId;
+    Long projectId;
     BigInteger userId;
     String title;
     Instant createdAt;

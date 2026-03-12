@@ -28,6 +28,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Long id) {
         Long userId = 1L;
         return ResponseEntity.ok(projectService.getUserProjectById(id, userId));
+
     }
 
     @PostMapping

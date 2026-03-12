@@ -13,7 +13,7 @@ import java.time.Instant;
 @Getter
 @Setter
 public class ProjectFile {
-    BigInteger id;
+    Long id;
     BigInteger projectId;
     String part;
     String minio_objectKey;

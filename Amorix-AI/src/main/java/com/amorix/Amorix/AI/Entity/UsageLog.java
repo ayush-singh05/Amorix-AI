@@ -1,9 +1,7 @@
 package com.amorix.Amorix.AI.Entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -12,8 +10,9 @@ import java.time.Instant;
 @NoArgsConstructor
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UsageLog {
-    BigInteger id;
+    Long id;
     BigInteger userId;
     BigInteger projectId;
     String action;

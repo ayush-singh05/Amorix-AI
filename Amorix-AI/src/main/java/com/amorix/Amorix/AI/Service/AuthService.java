@@ -1,6 +1,6 @@
 package com.amorix.Amorix.AI.Service;
 
-import com.amorix.Amorix.AI.Dto.Auth.Request.AuthResponseDto;
+import com.amorix.Amorix.AI.Dto.Auth.Response.AuthResponseDto;
 import com.amorix.Amorix.AI.Dto.Auth.Request.LoginRequestDto;
 import com.amorix.Amorix.AI.Dto.Auth.Request.SignupRequestDto;
 
