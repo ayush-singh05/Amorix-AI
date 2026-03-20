@@ -3,7 +3,10 @@ package com.amorix.Amorix.AI.Controller;
 import com.amorix.Amorix.AI.Dto.Project.Request.ProjectRequestDto;
 import com.amorix.Amorix.AI.Dto.Project.Request.ProjectSummaryResponseDto;
 import com.amorix.Amorix.AI.Dto.Project.Response.ProjectResponseDto;
+import com.amorix.Amorix.AI.Entity.Project;
+import com.amorix.Amorix.AI.Repository.ProjectRepository;
 import com.amorix.Amorix.AI.Service.ProjectService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getUserProjects(userId));
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Long id) {
         Long userId = 1L;
@@ -32,13 +36,13 @@ public class ProjectController {
     }
 
     @PostMapping
-    public ResponseEntity<ProjectResponseDto> createProject(@RequestBody ProjectRequestDto request) {
+    public ResponseEntity<ProjectResponseDto> createProject(@RequestBody @Valid ProjectRequestDto request) {
         Long userId = 1L;
         return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request, userId));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Long id, @RequestBody ProjectRequestDto request) {
+    public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Long id, @RequestBody @Valid ProjectRequestDto request) {
         Long userId = 1L;
         return ResponseEntity.ok(projectService.updateProject(id, request, userId));
     }

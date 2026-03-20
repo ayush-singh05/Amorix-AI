@@ -1,5 +1,6 @@
 package com.amorix.Amorix.AI.Entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -28,8 +29,9 @@ public class Project {
     @CreationTimestamp
     Instant createdAt;
 
-    @UpdateTimestamp
+    @UpdateTimestamp //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     Instant updatedAt;
 
+    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     Instant deletedAt;
 }

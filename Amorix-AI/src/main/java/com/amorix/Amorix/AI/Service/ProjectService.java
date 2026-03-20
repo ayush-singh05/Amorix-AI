@@ -6,6 +6,7 @@ import com.amorix.Amorix.AI.Dto.Project.Response.ProjectResponseDto;
 
 import java.util.List;
 
+
 public interface ProjectService {
 
 

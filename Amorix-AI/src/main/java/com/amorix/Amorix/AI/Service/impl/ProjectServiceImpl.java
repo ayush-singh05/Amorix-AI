@@ -5,32 +5,35 @@ import com.amorix.Amorix.AI.Dto.Project.Request.ProjectSummaryResponseDto;
 import com.amorix.Amorix.AI.Dto.Project.Response.ProjectResponseDto;
 import com.amorix.Amorix.AI.Entity.Project;
 import com.amorix.Amorix.AI.Entity.User;
+import com.amorix.Amorix.AI.Errors.ResourceNotFoundException;
 import com.amorix.Amorix.AI.Repository.ProjectRepository;
 import com.amorix.Amorix.AI.Repository.UserRepository;
 import com.amorix.Amorix.AI.Service.ProjectService;
 import com.amorix.Amorix.AI.Transformer.ProjectTransformer;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Transactional
 public class ProjectServiceImpl implements ProjectService {
 
     UserRepository userRepository;
     ProjectRepository projectRepository;
-//    private static final Logger logger = (Logger) LoggerFactory.getLogger(ProjectTransformer.class);
+
 
     @Override
     public List<ProjectSummaryResponseDto> getUserProjects(Long userId) {
 
-        List<Project> projects = projectRepository.findAll();
-//        logger.info("user id : " + userId);
+        var projects = projectRepository.findAllAccessibleByUser(userId);
 
         return ProjectTransformer.projectToProjectSummaryResponseDto(projects);
     }
@@ -38,7 +41,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponseDto getUserProjectById(Long id, Long userId) {
-           return null;
+        Project project = getAccessibleProjectById(id, userId);
+        return ProjectTransformer.projectToProjectResponseDto(project);
     }
 
     @Override
@@ -46,19 +50,33 @@ public class ProjectServiceImpl implements ProjectService {
         User user = userRepository.findById(userId).orElse(null);
 
         Project project = ProjectTransformer.projectRequestDtoToProject(request);
+
         project.setOwner(user);
-        Project saveProject = projectRepository.save(project);
+        Project saveProject = projectRepository.saveAndFlush(project);
 
         return ProjectTransformer.projectToProjectResponseDto(saveProject);
     }
 
     @Override
     public ProjectResponseDto updateProject(Long id, ProjectRequestDto request, Long userId) {
-        return null;
+
+        Project project = getAccessibleProjectById(id, userId);
+        project.setName(request.name());
+        Project  saveProject = projectRepository.save(project);
+
+        return ProjectTransformer.projectToProjectResponseDto(saveProject);
     }
 
     @Override
     public void softDelete(Long id, Long userId) {
+        Project project = getAccessibleProjectById(id, userId);
+        project.setDeletedAt(Instant.now());
+        projectRepository.save(project);
+    }
 
+    // Internal Function
+    public Project getAccessibleProjectById(Long projectId, Long userId) {
+        return projectRepository.findAllAccessibleProjectById(projectId,userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", projectId.toString()));
     }
 }

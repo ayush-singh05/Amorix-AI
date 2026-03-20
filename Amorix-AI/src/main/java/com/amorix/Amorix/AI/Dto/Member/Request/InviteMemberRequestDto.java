@@ -1,9 +1,12 @@
 package com.amorix.Amorix.AI.Dto.Member.Request;
 
 import com.amorix.Amorix.AI.Enum.ProjectRole;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record InviteMemberRequestDto(
-        String email,
-        ProjectRole role
+        @Email @NotBlank String email,
+       @NotNull ProjectRole role
 ) {
 }

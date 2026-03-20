@@ -1,6 +1,7 @@
 package com.amorix.Amorix.AI.Controller;
 
 import com.amorix.Amorix.AI.Dto.Member.Request.InviteMemberRequestDto;
+import com.amorix.Amorix.AI.Dto.Member.Request.UpdateMemberRoleRequestDto;
 import com.amorix.Amorix.AI.Dto.Member.Response.MemberResponseDto;
 import com.amorix.Amorix.AI.Entity.ProjectMember;
 import com.amorix.Amorix.AI.Service.ProjectMemberService;
@@ -19,8 +20,8 @@ public class ProjectMemberController {
     private final ProjectMemberService projectMemberService;
 
     @GetMapping
-    public ResponseEntity<List<ProjectMember>> getProjectMembers(@PathVariable String projectId) {
-        Long userId = 1L;
+    public ResponseEntity<List<MemberResponseDto>> getProjectMembers(@PathVariable Long projectId) {
+        Long userId = 10L;
         return ResponseEntity.ok(projectMemberService.getProjectMember(projectId));
     }
 
@@ -37,9 +38,15 @@ public class ProjectMemberController {
     public ResponseEntity<MemberResponseDto> updateMemberRole(
             @PathVariable Long projectId,
             @PathVariable Long memberId,
-            @RequestBody InviteMemberRequestDto request
+            @RequestBody UpdateMemberRoleRequestDto request
     ){
         Long userId = 1L;
-        return ResponseEntity.ok(projectMemberService.deleteProjectMember(projectId,memberId,request));
+        return ResponseEntity.ok(projectMemberService.updateMemberRole(projectId,memberId,request));
+    }
+
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<Void> deleteMember(@PathVariable Long projectId, @PathVariable Long memberId){
+        projectMemberService.deleteProjectMember(projectId,memberId);
+        return ResponseEntity.noContent().build();
     }
 }
