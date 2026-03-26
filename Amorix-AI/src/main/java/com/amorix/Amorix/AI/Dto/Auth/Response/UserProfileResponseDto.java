@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public record UserProfileResponseDto(
         Long id,
-        String email,
+        String username,
         String name,
         String avatarUrl
 ) {

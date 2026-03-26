@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record LoginRequestDto(
-        @Email @NotNull String email,
+        @Email @NotNull String username,
         @Size(min = 4, max = 16) String password
 ) {
 }

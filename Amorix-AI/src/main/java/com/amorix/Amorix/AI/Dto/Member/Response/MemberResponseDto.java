@@ -8,7 +8,7 @@ import java.time.Instant;
 @Builder
 public record MemberResponseDto(
         Long userId,
-        String email,
+        String username,
         String name,
         String avatarUrl,
         ProjectRole role,

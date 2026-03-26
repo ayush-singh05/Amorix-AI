@@ -7,6 +7,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class BadRequestException extends RuntimeException {
-    String message;
 
+    public BadRequestException(String message) {
+        super(message);
+    }
 }

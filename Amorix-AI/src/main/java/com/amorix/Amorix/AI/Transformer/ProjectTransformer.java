@@ -43,7 +43,7 @@ public class ProjectTransformer {
             MemberResponseDto memberResponseDto = MemberResponseDto.builder()
                     .name(projectMember.getUser().getName())
 
-                    .email(projectMember.getUser().getEmail())
+                    .username(projectMember.getUser().getUsername())
                     .role(projectMember.getProjectRole())
                     .userId(projectMember.getUser().getId())
                     .avatarUrl(projectMember.getUser().getAvatar())
@@ -56,7 +56,7 @@ public class ProjectTransformer {
         return MemberResponseDto.builder()
                 .userId(user.getId())
                 .name(user.getName())
-                .email(user.getEmail())
+                .username(user.getUsername())
                 .build();
     }
 }

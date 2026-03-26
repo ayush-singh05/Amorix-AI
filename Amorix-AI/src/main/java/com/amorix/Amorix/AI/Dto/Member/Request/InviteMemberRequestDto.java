@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record InviteMemberRequestDto(
-        @Email @NotBlank String email,
+        @Email @NotBlank String username,
        @NotNull ProjectRole role
 ) {
 }

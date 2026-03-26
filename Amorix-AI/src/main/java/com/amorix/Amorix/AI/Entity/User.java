@@ -6,9 +6,13 @@ import lombok.experimental.FieldDefaults;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +22,7 @@ import java.time.Instant;
 @Entity
 @Builder
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
@@ -26,7 +30,7 @@ public class User {
 
 
     String name;
-    String email;
+//    String email;
     String password;
     String avatar;
 
@@ -37,4 +41,30 @@ public class User {
     Instant updatedAt;
 
     Instant deletedAt;
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
 }
