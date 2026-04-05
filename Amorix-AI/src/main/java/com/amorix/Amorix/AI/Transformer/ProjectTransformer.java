@@ -2,15 +2,15 @@ package com.amorix.Amorix.AI.Transformer;
 
 import com.amorix.Amorix.AI.Dto.Member.Response.MemberResponseDto;
 import com.amorix.Amorix.AI.Dto.Project.Request.ProjectRequestDto;
-import com.amorix.Amorix.AI.Dto.Project.Request.ProjectSummaryResponseDto;
 import com.amorix.Amorix.AI.Dto.Project.Response.ProjectResponseDto;
+import com.amorix.Amorix.AI.Dto.Project.Response.ProjectSummaryResponseDto;
 import com.amorix.Amorix.AI.Entity.Project;
 import com.amorix.Amorix.AI.Entity.ProjectMember;
 import com.amorix.Amorix.AI.Entity.User;
+import com.amorix.Amorix.AI.Enum.ProjectRole;
 
-import java.time.Instant;
+import javax.management.relation.Role;
 import java.util.List;
-import java.util.Optional;
 
 public class ProjectTransformer {
     public static ProjectResponseDto projectToProjectResponseDto(Project project) {
@@ -30,15 +30,13 @@ public class ProjectTransformer {
 
         return project;
     }
-    public static List<ProjectSummaryResponseDto>  projectToProjectSummaryResponseDto( List<Project> projects) {
+    public static List<ProjectSummaryResponseDto>  projectToProjectSummaryResponseDto(List<Project> projects) {
         return projects.stream()
-                .map(project -> new ProjectSummaryResponseDto(
-                        project.getId(),
-                        project.getName(),
-                        project.getCreatedAt(),
-                        project.getUpdatedAt()
-                )).toList();
+                .map(ProjectTransformer::projectToSummaryResponseDto)
+                .toList();
+
     }
+
     public static MemberResponseDto ProjectMemberToMemberResponseDto(ProjectMember projectMember) {
             MemberResponseDto memberResponseDto = MemberResponseDto.builder()
                     .name(projectMember.getUser().getName())
@@ -57,6 +55,22 @@ public class ProjectTransformer {
                 .userId(user.getId())
                 .name(user.getName())
                 .username(user.getUsername())
+                .build();
+    }
+
+    public static ProjectSummaryResponseDto projectToProjectSummaryResponseDto(Project project, ProjectRole role) {
+        return ProjectSummaryResponseDto.builder()
+                .name(project.getName())
+                .createdAt(project.getCreatedAt())
+                .updatedAt(project.getUpdatedAt())
+                .id(project.getId())
+                .role(role)
+                .build();
+    }
+    public static ProjectSummaryResponseDto projectToSummaryResponseDto(Project project) {
+        return ProjectSummaryResponseDto.builder()
+                .name(project.getName())
+                .id(project.getId())
                 .build();
     }
 }

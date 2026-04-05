@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/v1/{projectId}/members")
+@RequestMapping("api/v1/projects/{projectId}/members")
 @RequiredArgsConstructor
 public class ProjectMemberController {
 
@@ -30,8 +30,8 @@ public class ProjectMemberController {
             @PathVariable Long projectId,
             @RequestBody InviteMemberRequestDto request
     ){
-        Long userId = 1L;
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectMemberService.inviteMember(projectId,request,userId));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectMemberService.inviteMember(projectId,request));
     }
 
     @PatchMapping("/{memberId}")

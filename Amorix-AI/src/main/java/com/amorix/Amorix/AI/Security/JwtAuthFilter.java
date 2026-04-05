@@ -1,5 +1,6 @@
 package com.amorix.Amorix.AI.Security;
 
+import com.amorix.Amorix.AI.Errors.GlobalExceptionHandlers;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,13 +26,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             try{
                 log.info("incoming request: {}",request.getRequestURI());
                 String requestHeaderToken =  request.getHeader("Authorization");
-
+                log.info("Authorization Header: {}", request.getHeader("Authorization"));
                 if(requestHeaderToken == null || !requestHeaderToken.startsWith("Bearer ")){
                     filterChain.doFilter(request,response);
                     return;
                 }
-                String token = requestHeaderToken.substring(7);
+                String token = requestHeaderToken.substring(7).trim();
+                log.info("token: {}", token);
                 JwtUserPrincipal user = authUtil.verifyAccessToken(token);
+                log.info("Jwt Auth Filter user: {}", user);
                 if(user != null && SecurityContextHolder.getContext().getAuthentication() == null){
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(
@@ -39,13 +42,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     null,
                                     user.authorities()
                     );
+                    log.info("Authorization Header: {}", request.getHeader("Authorization"));
+                    SecurityContextHolder.clearContext();
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
                 filterChain.doFilter(request,response);
 
             }catch(Exception e){
+                log.error("JWT Filter Error", e);
                 handlerExceptionResolver.resolveException(request,response,null,e);
-
+                return;
             }
     }
 }

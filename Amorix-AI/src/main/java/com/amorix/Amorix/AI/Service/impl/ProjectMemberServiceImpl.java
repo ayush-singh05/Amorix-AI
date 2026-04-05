@@ -10,11 +10,13 @@ import com.amorix.Amorix.AI.Entity.User;
 import com.amorix.Amorix.AI.Repository.ProjectMemberRepository;
 import com.amorix.Amorix.AI.Repository.ProjectRepository;
 import com.amorix.Amorix.AI.Repository.UserRepository;
+import com.amorix.Amorix.AI.Security.AuthUtil;
 import com.amorix.Amorix.AI.Service.ProjectMemberService;
 import com.amorix.Amorix.AI.Transformer.ProjectTransformer;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -29,46 +31,55 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
     ProjectRepository projectRepository;
     ProjectMemberRepository projectMemberRepository;
     UserRepository userRepository;
+    AuthUtil authUtil;
 
     @Override
+    @PreAuthorize("@security.canViewMembers(#projectId)")
     public List<MemberResponseDto> getProjectMember(Long projectId) {
 
-        Long userId = 1L;
-
-        // Validate access
-        Project project = getAccessibleProjectById(projectId, userId);
-
-        List<MemberResponseDto> memberResponseDtoList = new ArrayList<>();
-
-        // Add project owner
-        MemberResponseDto ownerDto =
-                ProjectTransformer.OwnerToMembarResponseDto(project.getOwner());
-
-        memberResponseDtoList.add(ownerDto);
-
-        // Fetch project members
-        List<ProjectMember> members =
-                projectMemberRepository.findByIdProjectId(projectId);
-
-        // Convert members to DTO
-        List<MemberResponseDto> memberDtos = members.stream()
+        return projectMemberRepository.findByIdProjectId(projectId)
+                .stream()
                 .map(ProjectTransformer::ProjectMemberToMemberResponseDto)
                 .toList();
 
-        memberResponseDtoList.addAll(memberDtos);
-
-        return memberResponseDtoList;
+//        Long userId = 1L;
+//
+//        // Validate access
+//        Project project = getAccessibleProjectById(projectId, userId);
+//
+//        List<MemberResponseDto> memberResponseDtoList = new ArrayList<>();
+//
+//        // Add project owner
+//        MemberResponseDto ownerDto =
+//                ProjectTransformer.OwnerToMembarResponseDto(project.getOwner());
+//
+//        memberResponseDtoList.add(ownerDto);
+//
+//        // Fetch project members
+//        List<ProjectMember> members =
+//                projectMemberRepository.findByIdProjectId(projectId);
+//
+//        // Convert members to DTO
+//        List<MemberResponseDto> memberDtos = members.stream()
+//                .map(ProjectTransformer::ProjectMemberToMemberResponseDto)
+//                .toList();
+//
+//        memberResponseDtoList.addAll(memberDtos);
+//
+//        return memberResponseDtoList;
     }
 
     @Override
-    public MemberResponseDto inviteMember(Long projectId, InviteMemberRequestDto request, Long userId) {
-
+    @PreAuthorize("@security.canManageMembers(#projectId)")
+    public MemberResponseDto inviteMember(Long projectId, InviteMemberRequestDto request) {
+        long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
         User invitee = userRepository.findByUsername(request.username()).orElseThrow();
+
         if(invitee.getId().equals(userId)) {
             throw new RuntimeException("Can't Invite yourself");
         }
-        ProjectMemberId projectMemberId = new ProjectMemberId(projectId, userId);
+        ProjectMemberId projectMemberId = new ProjectMemberId(projectId, invitee.getId());
         if(projectMemberRepository.existsById(projectMemberId)) {
             throw new RuntimeException("Cannot invite once again");
         }
@@ -86,7 +97,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     @Override
     public MemberResponseDto updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequestDto request) {
-        Long userId = 1L;
+        long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId);
         ProjectMember projectMember = projectMemberRepository.findById(projectMemberId)
@@ -99,7 +110,7 @@ public class ProjectMemberServiceImpl implements ProjectMemberService {
 
     @Override
     public void deleteProjectMember(Long projectId, Long memberId) {
-        Long userId = 1L;
+        long userId = authUtil.getCurrentUserId();
         Project project = getAccessibleProjectById(projectId, userId);
         ProjectMemberId projectMemberId = new ProjectMemberId(projectId, memberId);
         if(!projectMemberRepository.existsById(projectMemberId)) {

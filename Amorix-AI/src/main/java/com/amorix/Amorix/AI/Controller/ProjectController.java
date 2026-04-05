@@ -1,10 +1,8 @@
 package com.amorix.Amorix.AI.Controller;
 
 import com.amorix.Amorix.AI.Dto.Project.Request.ProjectRequestDto;
-import com.amorix.Amorix.AI.Dto.Project.Request.ProjectSummaryResponseDto;
 import com.amorix.Amorix.AI.Dto.Project.Response.ProjectResponseDto;
-import com.amorix.Amorix.AI.Entity.Project;
-import com.amorix.Amorix.AI.Repository.ProjectRepository;
+import com.amorix.Amorix.AI.Dto.Project.Response.ProjectSummaryResponseDto;
 import com.amorix.Amorix.AI.Service.ProjectService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,34 +21,32 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<List<ProjectSummaryResponseDto>> getMyProjects() {
-        Long userId = 1L; //TODO: update later with real Spring Security
-        return ResponseEntity.ok(projectService.getUserProjects(userId));
+        return ResponseEntity.ok(projectService.getUserProjects());
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> getProjectById(@PathVariable Long id) {
-        Long userId = 1L;
-        return ResponseEntity.ok(projectService.getUserProjectById(id, userId));
+    public ResponseEntity<ProjectSummaryResponseDto> getProjectById(@PathVariable Long id) {
+//        Long userId = 1L;
+        return ResponseEntity.ok(projectService.getUserProjectById(id));
 
     }
 
     @PostMapping
     public ResponseEntity<ProjectResponseDto> createProject(@RequestBody @Valid ProjectRequestDto request) {
-        Long userId = 1L;
-        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request, userId));
+//        Long userId = 1L;
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request));
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ProjectResponseDto> updateProject(@PathVariable Long id, @RequestBody @Valid ProjectRequestDto request) {
-        Long userId = 1L;
-        return ResponseEntity.ok(projectService.updateProject(id, request, userId));
+        return ResponseEntity.ok(projectService.updateProject(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
-        Long userId = 1L;
-        projectService.softDelete(id, userId);
+
+        projectService.softDelete(id);
         return ResponseEntity.noContent().build();
     }
 

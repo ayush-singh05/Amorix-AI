@@ -1,8 +1,8 @@
 package com.amorix.Amorix.AI.Service;
 
 import com.amorix.Amorix.AI.Dto.Project.Request.ProjectRequestDto;
-import com.amorix.Amorix.AI.Dto.Project.Request.ProjectSummaryResponseDto;
 import com.amorix.Amorix.AI.Dto.Project.Response.ProjectResponseDto;
+import com.amorix.Amorix.AI.Dto.Project.Response.ProjectSummaryResponseDto;
 
 import java.util.List;
 
@@ -10,14 +10,14 @@ import java.util.List;
 public interface ProjectService {
 
 
-    List<ProjectSummaryResponseDto> getUserProjects(Long userId);
+    List<ProjectSummaryResponseDto> getUserProjects();
 
-    ProjectResponseDto getUserProjectById(Long id, Long userId);
+    ProjectSummaryResponseDto getUserProjectById(Long id);
 
-    ProjectResponseDto createProject(ProjectRequestDto request, Long userId);
+    ProjectResponseDto createProject(ProjectRequestDto request);
 
-    ProjectResponseDto updateProject(Long id, ProjectRequestDto request, Long userId);
+    ProjectResponseDto updateProject(Long id, ProjectRequestDto request);
 
-    void softDelete(Long id, Long userId);
+    void softDelete(Long id);
 
 }

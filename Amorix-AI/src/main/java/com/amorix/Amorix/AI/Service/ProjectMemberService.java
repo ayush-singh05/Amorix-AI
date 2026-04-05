@@ -12,7 +12,7 @@ public interface ProjectMemberService {
     List<MemberResponseDto> getProjectMember(Long projectId);
 
 
-    MemberResponseDto inviteMember(Long projectId, InviteMemberRequestDto request,Long userId);
+    MemberResponseDto inviteMember(Long projectId, InviteMemberRequestDto request);
 
     MemberResponseDto updateMemberRole(Long projectId, Long memberId, UpdateMemberRoleRequestDto request);
 

@@ -1,7 +1,12 @@
 package com.amorix.Amorix.AI.Entity;
 
+import com.amorix.Amorix.AI.Enum.SubscriptionStatus;
+import com.stripe.model.Event;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -9,17 +14,36 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Subscription {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    BigInteger userId;
-    BigInteger planId;
-    String stripeSubscriptionId;
-    String status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "user_id")
+    User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false, name = "plan_id")
+    Plan plan;
+
+    @Enumerated(value = EnumType.STRING)
+    SubscriptionStatus status;
+
+    String stripeSubscriptionId; //can be renamed to gatewaySubscriptionId
+
     Instant currentPeriodStart;
     Instant currentPeriodEnd;
-    Boolean cancelAtPeriodEnd;
+    Boolean cancelAtPeriodEnd = false;
+
+    @CreationTimestamp
     Instant createdAt;
-    Instant deletedAt;
+
+    @UpdateTimestamp
+    Instant updatedAt;
+
+
 }

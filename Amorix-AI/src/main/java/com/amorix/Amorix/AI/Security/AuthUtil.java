@@ -5,6 +5,7 @@ import com.amorix.Amorix.AI.Entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class AuthUtil {
 
@@ -31,6 +33,8 @@ public class AuthUtil {
                 .claim("userId",user.getId().toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis()+1000*60*10))
+                .signWith(getSecretKey())
+//                .signWith(getSecretKey(), io.jsonwebtoken.SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -43,6 +47,7 @@ public class AuthUtil {
 
         Long userId = Long.parseLong(claims.get("userId", String.class));
         String username = claims.getSubject();
+        log.info("username = {}", username);
         return new JwtUserPrincipal(userId, username, new ArrayList<>());
     }
 
