@@ -11,12 +11,14 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigInteger;
 import java.time.Instant;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Builder
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Table(name = "subscription")
 public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

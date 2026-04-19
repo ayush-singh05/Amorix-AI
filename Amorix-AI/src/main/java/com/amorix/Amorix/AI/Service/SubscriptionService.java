@@ -3,25 +3,25 @@ package com.amorix.Amorix.AI.Service;
 import com.amorix.Amorix.AI.Dto.Subscription.Request.CheckoutRequestDto;
 import com.amorix.Amorix.AI.Dto.Subscription.Response.CheckoutResponseDto;
 import com.amorix.Amorix.AI.Dto.Subscription.Response.PortalResponseDto;
+import com.amorix.Amorix.AI.Dto.Subscription.Response.SubscriptionResponseDto;
 import com.amorix.Amorix.AI.Enum.SubscriptionStatus;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+@Service
 public interface SubscriptionService {
-    SubscriptionService getMySubsciption(Long userId);
-
-    CheckoutResponseDto createCheckoutSessionUrl(CheckoutRequestDto request, Long userId);
-
-    PortalResponseDto openCustomerPortal(Long userId);
+    SubscriptionResponseDto getCurrentSubscription();
 
     void activateSubscription(Long userId, Long planId, String subscriptionId, String customerId);
 
-    void updateSubscription(Long id, SubscriptionStatus status, Instant periodStart, Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId);
+    void updateSubscription(String gatewaySubscriptionId, SubscriptionStatus status, Instant periodStart, Instant periodEnd, Boolean cancelAtPeriodEnd, Long planId);
 
-    void markSubscriptionPastDue(String subId);
+    void cancelSubscription(String gatewaySubscriptionId);
 
     void renewSubscriptionPeriod(String subId, Instant periodStart, Instant periodEnd);
 
-    void cancelSubscription(Long id);
+    void markSubscriptionPastDue(String subId);
 
+    boolean canCreateNewProject();
 }

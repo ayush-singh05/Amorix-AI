@@ -9,4 +9,5 @@ public interface PlanService {
     List<PlanResponseDto> getAllPlans();
 
 
+    List<PlanResponseDto> getAllActivePlanS();
 }

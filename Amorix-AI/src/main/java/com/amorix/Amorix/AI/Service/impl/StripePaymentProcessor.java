@@ -4,7 +4,7 @@ import com.amorix.Amorix.AI.Dto.Subscription.Request.CheckoutRequestDto;
 import com.amorix.Amorix.AI.Dto.Subscription.Response.CheckoutResponseDto;
 import com.amorix.Amorix.AI.Dto.Subscription.Response.PortalResponseDto;
 import com.amorix.Amorix.AI.Entity.Plan;
-import com.amorix.Amorix.AI.Entity.Subscription;
+//import com.amorix.Amorix.AI.Entity.Subscription;
 import com.amorix.Amorix.AI.Entity.User;
 import com.amorix.Amorix.AI.Enum.SubscriptionStatus;
 import com.amorix.Amorix.AI.Errors.BadRequestException;
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import com.stripe.model.Subscription;
 import java.time.Instant;
 import java.util.Map;
 
@@ -41,46 +41,40 @@ class StripePaymentProcessor implements PaymentProcessor {
 
     @Override
     public CheckoutResponseDto createCheckoutSessionUrl(CheckoutRequestDto request) {
-        log.info("request header : {}",request);
-        Plan plan = planRepository.findById(request.planId())
-                .orElseThrow(() -> new ResourceNotFoundException("Plan", request.planId().toString()));
-        log.info("fetch plan : {}", plan);
-        long userId = authUtil.getCurrentUserId();
+        Plan plan = planRepository.findById(request.planId()).orElseThrow(() ->
+                new ResourceNotFoundException("Plan", request.planId().toString()));
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", String.valueOf(userId)));
-        log.info("User int Stripe payment  : {}", user);
-        SessionCreateParams.Builder params = SessionCreateParams.builder()
+        Long userId = authUtil.getCurrentUserId();
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("user", userId.toString()));
+
+        var params = SessionCreateParams.builder()
                 .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setPrice(plan.getStripePriceId())
-                                .setQuantity(1L)
-                                .build()
-                )
+                        SessionCreateParams.LineItem.builder().setPrice(plan.getStripePriceId()).setQuantity(1L).build())
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
                 .setSubscriptionData(
-                        SessionCreateParams.SubscriptionData.builder().build()
+                        new SessionCreateParams.SubscriptionData.Builder()
+                                .setBillingMode(SessionCreateParams.SubscriptionData.BillingMode.builder()
+                                        .setType(SessionCreateParams.SubscriptionData.BillingMode.Type.FLEXIBLE)
+                                        .build())
+                                .build()
                 )
                 .setSuccessUrl(frontendUrl + "/success.html?session_id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl(frontendUrl + "/cancel.html")
-                .putMetadata("user_id", String.valueOf(user.getId()))
+                .putMetadata("user_id", userId.toString())
                 .putMetadata("plan_id", plan.getId().toString());
 
         try {
             String stripeCustomerId = user.getStripeCustomerId();
-
-            if (stripeCustomerId != null && !stripeCustomerId.isEmpty()) {
-                params.setCustomer(stripeCustomerId);
-            } else {
+            if(stripeCustomerId == null || stripeCustomerId.isEmpty()) {
                 params.setCustomerEmail(user.getUsername());
+            } else {
+                params.setCustomer(stripeCustomerId); // stripe customer Id
             }
-
-            Session session = Session.create(params.build());
-
+            Session session = Session.create(params.build()); // making api call to the Stripe Backend
             return new CheckoutResponseDto(session.getUrl());
-
         } catch (StripeException e) {
-            throw new RuntimeException("Stripe error while creating checkout session", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -165,7 +159,6 @@ class StripePaymentProcessor implements PaymentProcessor {
                 subscription.getId(), status, periodStart, periodEnd,
                 subscription.getCancelAtPeriodEnd(), planId
         );
-
     }
 
     private void handleCustomerSubscriptionDeleted(Subscription subscription) {
@@ -178,14 +171,16 @@ class StripePaymentProcessor implements PaymentProcessor {
 
     private void handleInvoicePaid(Invoice invoice) {
         String subId = extractSubscriptionId(invoice);
-        if(subId == null) return;
+        if (subId == null) return;
 
         try {
-            Subscription subscription = Subscription.retrieve(subId); //sdk calling the Stripe server
-            var item = subscription.getItems().getData().get(0);
+            var lines = invoice.getLines();
+            if (lines == null || lines.getData().isEmpty()) return;
 
-            Instant periodStart = toInstant(item.getCurrentPeriodStart());
-            Instant periodEnd = toInstant(item.getCurrentPeriodEnd());
+            var line = lines.getData().get(0);
+
+            Instant periodStart = toInstant(line.getPeriod().getStart());
+            Instant periodEnd = toInstant(line.getPeriod().getEnd());
 
             subscriptionService.renewSubscriptionPeriod(
                     subId,
@@ -193,10 +188,9 @@ class StripePaymentProcessor implements PaymentProcessor {
                     periodEnd
             );
 
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("Error handling invoice paid for subscription {}", subId, e);
         }
-
     }
 
     private void handleInvoicePaymentFailed(Invoice invoice) {
