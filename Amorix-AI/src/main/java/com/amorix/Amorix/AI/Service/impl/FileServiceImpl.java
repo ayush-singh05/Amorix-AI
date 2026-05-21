@@ -1,6 +1,6 @@
 package com.amorix.Amorix.AI.Service.impl;
 
-import com.amorix.Amorix.AI.Dto.File.Response.FileContentResponseDto;
+import com.amorix.Amorix.AI.Dto.Project.Response.FileContentResponseDto;
 import com.amorix.Amorix.AI.Dto.Project.Response.FileNodeResponseDto;
 import com.amorix.Amorix.AI.Service.FileService;
 import org.springframework.stereotype.Service;

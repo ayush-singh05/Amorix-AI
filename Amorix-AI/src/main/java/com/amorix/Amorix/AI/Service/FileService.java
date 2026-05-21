@@ -1,6 +1,6 @@
 package com.amorix.Amorix.AI.Service;
 
-import com.amorix.Amorix.AI.Dto.File.Response.FileContentResponseDto;
+import com.amorix.Amorix.AI.Dto.Project.Response.FileContentResponseDto;
 import com.amorix.Amorix.AI.Dto.Project.Response.FileNodeResponseDto;
 
 import java.util.List;
